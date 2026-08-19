@@ -254,6 +254,60 @@ h1 {
   padding: 0 14px;
 }
 
+.softKeyboard {
+  background: #f8faf6;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  margin-top: 12px;
+  padding: 12px;
+}
+
+.keyboardHeader {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.keyboardHeader span {
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.caseToggle,
+.keyGrid button {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  color: var(--ink);
+}
+
+.caseToggle {
+  min-height: 34px;
+  padding: 0 12px;
+}
+
+.keyGrid {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(15, minmax(34px, 1fr));
+}
+
+.keyGrid button {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 20px;
+  font-weight: 700;
+  min-height: 42px;
+}
+
+.keyGrid button:hover,
+.caseToggle:hover {
+  border-color: var(--green);
+  color: var(--green);
+}
+
 .feedback {
   background: #fff7df;
   border: 1px solid #ecd58a;
@@ -366,5 +420,9 @@ h1 {
 
   .answerRow {
     grid-template-columns: 1fr;
+  }
+
+  .keyGrid {
+    grid-template-columns: repeat(5, minmax(42px, 1fr));
   }
 }

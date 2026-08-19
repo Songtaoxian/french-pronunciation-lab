@@ -140,6 +140,8 @@ const modes = [
   ["verbs", "动词变位"],
 ] as const;
 
+const frenchKeys = ["à", "â", "ç", "é", "è", "ê", "ë", "î", "ï", "ô", "ù", "û", "ü", "œ", "æ"];
+
 const initialProgress = () =>
   Object.fromEntries(words.map((word) => [word.id, { mastery: 24, due: new Date().toISOString(), mistakes: 0 }]));
 
@@ -150,6 +152,7 @@ export default function FrenchLab() {
   const [feedback, setFeedback] = useState("");
   const [progress, setProgress] = useState<Progress>(initialProgress);
   const [reviewOnly, setReviewOnly] = useState(false);
+  const [upperKeys, setUpperKeys] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem("french-lab-progress");
@@ -213,6 +216,10 @@ export default function FrenchLab() {
     setFeedback("已预留导入接口：可接 Lexique、Wiktionary dump、OpenSubtitles 词频、Forvo/开放 TTS 音频索引。MVP 当前使用示例开放结构。");
   }
 
+  function insertFrenchKey(key: string) {
+    setAnswer((value) => `${value}${key}`);
+  }
+
   return (
     <main>
       <section className="topbar">
@@ -263,6 +270,24 @@ export default function FrenchLab() {
             />
             <button onClick={check}>检查</button>
             <button className="ghost" onClick={next}>下一题</button>
+          </div>
+          <div className="softKeyboard" aria-label="法语特殊字母输入键盘">
+            <div className="keyboardHeader">
+              <span>法语特殊字母</span>
+              <button className="caseToggle" onClick={() => setUpperKeys((value) => !value)}>
+                {upperKeys ? "小写" : "大写"}
+              </button>
+            </div>
+            <div className="keyGrid">
+              {frenchKeys.map((key) => {
+                const label = upperKeys ? key.toUpperCase() : key;
+                return (
+                  <button key={key} type="button" onClick={() => insertFrenchKey(label)} aria-label={`输入 ${label}`}>
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
           {feedback && <p className="feedback">{feedback}</p>}
         </section>
