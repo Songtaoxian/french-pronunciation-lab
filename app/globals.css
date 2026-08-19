@@ -48,6 +48,36 @@ main {
   padding-bottom: 18px;
 }
 
+.topActions {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+}
+
+.viewSwitch {
+  background: #eef3ed;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+}
+
+.viewSwitch button {
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  color: var(--muted);
+  min-height: 34px;
+  padding: 0 14px;
+}
+
+.viewSwitch button.active {
+  background: white;
+  color: var(--green);
+  font-weight: 700;
+}
+
 .eyebrow {
   color: var(--green);
   font-size: 13px;
@@ -374,6 +404,140 @@ h1 {
   max-width: 1320px;
 }
 
+.vocabularyPanel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  margin: 0 auto;
+  max-width: 1320px;
+  padding: 20px;
+}
+
+.vocabHeader {
+  align-items: start;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.vocabHeader h2 {
+  font-size: 32px;
+  margin-bottom: 6px;
+}
+
+.vocabHeader p,
+.wordCardMain p,
+.wordFamily {
+  color: var(--muted);
+}
+
+.levelSummary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.levelSummary span,
+.levelTabs button,
+.wordTags span {
+  background: #f8faf6;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+}
+
+.levelSummary span {
+  color: var(--muted);
+  padding: 10px 12px;
+}
+
+.levelSummary b {
+  color: var(--green);
+  margin-right: 6px;
+}
+
+.levelTabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.levelTabs button {
+  color: var(--ink);
+  min-height: 40px;
+  padding: 0 16px;
+}
+
+.levelTabs button.active {
+  background: var(--green);
+  border-color: var(--green);
+  color: white;
+}
+
+.wordList {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.wordCard {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+}
+
+.wordCardMain {
+  display: grid;
+  gap: 6px;
+}
+
+.wordCardMain h3 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 36px;
+  line-height: 1;
+  margin-bottom: 0;
+}
+
+.wordMeta {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.wordMeta span {
+  background: #f4f6ef;
+  border-radius: 7px;
+  color: var(--muted);
+  padding: 10px;
+}
+
+.wordTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.wordTags span {
+  color: var(--muted);
+  padding: 8px 10px;
+}
+
+.wordFamily {
+  margin-bottom: 0;
+}
+
+.wordCard button {
+  background: var(--blue);
+  border: 1px solid var(--blue);
+  border-radius: 7px;
+  color: white;
+  min-height: 42px;
+}
+
 .architecture h2 {
   font-size: 20px;
   margin-bottom: 10px;
@@ -400,9 +564,20 @@ h1 {
   }
 
   .topbar,
-  .wordHeader {
+  .wordHeader,
+  .vocabHeader {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .topActions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .viewSwitch {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
   }
 
   .workspace {
@@ -414,7 +589,12 @@ h1 {
   }
 
   .tiles,
-  .pipeline {
+  .pipeline,
+  .wordList {
+    grid-template-columns: 1fr;
+  }
+
+  .wordMeta {
     grid-template-columns: 1fr;
   }
 

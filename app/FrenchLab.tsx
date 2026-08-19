@@ -17,6 +17,7 @@ type Word = {
 };
 
 type Progress = Record<string, { mastery: number; due: string; mistakes: number; lastMode?: string }>;
+type LevelFilter = "全部" | Word["level"];
 
 const words: Word[] = [
   {
@@ -129,6 +130,54 @@ const words: Word[] = [
       { letters: "eau", sound: "/o/", hint: "别被三个字母吓到" },
     ],
   },
+  {
+    id: "accueillir",
+    lemma: "accueillir",
+    ipa: "/akœjiʁ/",
+    meaning: "接待；欢迎",
+    frequency: 48,
+    level: "B1",
+    family: ["accueil", "accueillant", "recueillir"],
+    roots: ["cueill-"],
+    rules: ["cueil/cueill 常含 /kœj/", "ill 在这里形成 /j/ 滑音", "词尾 r 发 /ʁ/"],
+    graphemes: [
+      { letters: "cueil", sound: "/kœj/", hint: "ue 不按英语读法处理" },
+      { letters: "ill", sound: "/j/", hint: "常形成类似 y 的滑音" },
+      { letters: "r", sound: "/ʁ/", hint: "法语小舌音" },
+    ],
+    conjugations: {
+      "j'": "accueille",
+      "tu": "accueilles",
+      "il/elle": "accueille",
+      "nous": "accueillons",
+      "vous": "accueillez",
+      "ils/elles": "accueillent",
+    },
+  },
+  {
+    id: "bouleverser",
+    lemma: "bouleverser",
+    ipa: "/bulvɛʁse/",
+    meaning: "打乱；使震动",
+    frequency: 32,
+    level: "B2",
+    family: ["bouleversement", "verser", "renverser"],
+    roots: ["vers-"],
+    rules: ["ou 读 /u/", "er 词尾读 /e/", "s 在两个元音之间常读 /z/，但这里保留 /s/"],
+    graphemes: [
+      { letters: "ou", sound: "/u/", hint: "圆唇后元音" },
+      { letters: "er", sound: "/e/", hint: "动词不定式尾音" },
+      { letters: "vers", sound: "/vɛʁs/", hint: "注意 r 与 s 都发音" },
+    ],
+    conjugations: {
+      "je": "bouleverse",
+      "tu": "bouleverses",
+      "il/elle": "bouleverse",
+      "nous": "bouleversons",
+      "vous": "bouleversez",
+      "ils/elles": "bouleversent",
+    },
+  },
 ];
 
 const modes = [
@@ -141,11 +190,13 @@ const modes = [
 ] as const;
 
 const frenchKeys = ["à", "â", "ç", "é", "è", "ê", "ë", "î", "ï", "ô", "ù", "û", "ü", "œ", "æ"];
+const levelFilters: LevelFilter[] = ["全部", "A1", "A2", "B1", "B2"];
 
 const initialProgress = () =>
   Object.fromEntries(words.map((word) => [word.id, { mastery: 24, due: new Date().toISOString(), mistakes: 0 }]));
 
 export default function FrenchLab() {
+  const [view, setView] = useState<"training" | "vocabulary">("training");
   const [mode, setMode] = useState<(typeof modes)[number][0]>("dictation");
   const [index, setIndex] = useState(0);
   const [answer, setAnswer] = useState("");
@@ -153,6 +204,7 @@ export default function FrenchLab() {
   const [progress, setProgress] = useState<Progress>(initialProgress);
   const [reviewOnly, setReviewOnly] = useState(false);
   const [upperKeys, setUpperKeys] = useState(false);
+  const [levelFilter, setLevelFilter] = useState<LevelFilter>("全部");
 
   useEffect(() => {
     const saved = localStorage.getItem("french-lab-progress");
@@ -169,6 +221,14 @@ export default function FrenchLab() {
   }, [progress, reviewOnly]);
 
   const word = queue[index % queue.length];
+  const vocabulary = useMemo(
+    () => words.filter((item) => levelFilter === "全部" || item.level === levelFilter),
+    [levelFilter],
+  );
+  const levelCounts = levelFilters.filter((level) => level !== "全部").map((level) => ({
+    level,
+    count: words.filter((item) => item.level === level).length,
+  }));
   const average = Math.round(Object.values(progress).reduce((sum, item) => sum + item.mastery, 0) / words.length);
   const weakWords = words.filter((item) => (progress[item.id]?.mistakes ?? 0) > 0 || progress[item.id]?.mastery < 55);
 
@@ -220,6 +280,15 @@ export default function FrenchLab() {
     setAnswer((value) => `${value}${key}`);
   }
 
+  function practiceWord(id: string) {
+    const nextIndex = queue.findIndex((item) => item.id === id);
+    setReviewOnly(false);
+    setIndex(nextIndex >= 0 ? nextIndex : words.findIndex((item) => item.id === id));
+    setAnswer("");
+    setFeedback("");
+    setView("training");
+  }
+
   return (
     <main>
       <section className="topbar">
@@ -227,10 +296,16 @@ export default function FrenchLab() {
           <p className="eyebrow">法语拼写和读音记忆训练</p>
           <h1>法语拼读训练台</h1>
         </div>
-        <button className="ghost" onClick={importOpenLexicon}>导入接口</button>
+        <div className="topActions">
+          <div className="viewSwitch" aria-label="页面视图">
+            <button className={view === "training" ? "active" : ""} onClick={() => setView("training")}>训练</button>
+            <button className={view === "vocabulary" ? "active" : ""} onClick={() => setView("vocabulary")}>词库</button>
+          </div>
+          <button className="ghost" onClick={importOpenLexicon}>导入接口</button>
+        </div>
       </section>
 
-      <section className="workspace">
+      {view === "training" ? <section className="workspace">
         <aside className="sidebar" aria-label="训练模式">
           {modes.map(([id, label]) => (
             <button key={id} className={mode === id ? "active" : ""} onClick={() => { setMode(id); setAnswer(""); setFeedback(""); }}>
@@ -312,7 +387,48 @@ export default function FrenchLab() {
             ))}
           </div>
         </aside>
-      </section>
+      </section> : <section className="vocabularyPanel">
+        <div className="vocabHeader">
+          <div>
+            <h2>分级词库</h2>
+            <p>按 CEFR 等级查看单词、读音、规则、词族和当前掌握度。</p>
+          </div>
+          <div className="levelSummary">
+            {levelCounts.map((item) => <span key={item.level}><b>{item.level}</b>{item.count} 词</span>)}
+          </div>
+        </div>
+        <div className="levelTabs" aria-label="词库等级筛选">
+          {levelFilters.map((level) => (
+            <button key={level} className={levelFilter === level ? "active" : ""} onClick={() => setLevelFilter(level)}>
+              {level}
+            </button>
+          ))}
+        </div>
+        <div className="wordList">
+          {vocabulary.map((item) => {
+            const itemProgress = progress[item.id] ?? { mastery: 0, mistakes: 0 };
+            return (
+              <article className="wordCard" key={item.id}>
+                <div className="wordCardMain">
+                  <span className="level">{item.level}</span>
+                  <h3>{item.lemma}</h3>
+                  <p>{item.ipa} · {item.meaning}</p>
+                </div>
+                <div className="wordMeta">
+                  <span>频率 {item.frequency}</span>
+                  <span>掌握 {itemProgress.mastery}%</span>
+                  <span>错题 {itemProgress.mistakes}</span>
+                </div>
+                <div className="wordTags">
+                  {item.rules.slice(0, 2).map((rule) => <span key={rule}>{rule}</span>)}
+                </div>
+                <p className="wordFamily">词族：{item.family.join(" / ")}</p>
+                <button onClick={() => practiceWord(item.id)}>练这个词</button>
+              </article>
+            );
+          })}
+        </div>
+      </section>}
 
       <section className="architecture">
         <h2>开放词库架构预留</h2>
